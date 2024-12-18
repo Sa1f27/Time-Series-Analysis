@@ -1,129 +1,105 @@
-# Data Processing Function Documentation
+## Time Series Analysis and Forecasting of Sales Data
 
-## Overview
-This script contains a Python function, `process_data`, designed to preprocess and clean sales data by integrating additional datasets such as oil prices and holiday information. It prepares the data for machine learning tasks by performing tasks like merging datasets, handling missing values, and encoding categorical features.
+This project involves analyzing and forecasting store sales data using Exploratory Data Analysis (EDA) and machine learning techniques. The objective is to gain insights from historical sales and predict future trends.
 
----
-
-## Function Description: `process_data`
-
-### Purpose
-The `process_data` function preprocesses the input DataFrame and enhances it with external data sources to create a ready-to-use dataset for training and testing machine learning models.
-
-### Key Features
-- **Dataset Integration**: Merges the input dataset with oil price and holiday data.
-- **Missing Data Handling**: Fills missing values for holiday types, crude oil prices, and other columns.
-- **Feature Engineering**: Creates additional features such as `is_holiday`, `day_number`, and one-hot encoding for product families.
-- **Robust Error Handling**: Includes safeguards to identify missing columns or merging issues.
+## Table of Contents
+1. [Project Overview](#project-overview)
+2. [Data Description](#data-description)
+3. [Key Steps](#key-steps)
+4. [Requirements](#requirements)
+5. [How to Use](#how-to-use)
+6. [Results](#results)
 
 ---
 
-### Function Signature
-```python
-process_data(df: pd.DataFrame, is_test: bool = False) -> pd.DataFrame
-```
+## Project Overview
 
-#### Parameters
-- **`df`** (`pd.DataFrame`): The input DataFrame containing sales data.
-- **`is_test`** (`bool`, default=`False`): A flag to indicate whether the dataset is for training or testing. Determines which columns are expected in the input.
+This project uses historical store sales data to perform:
+- **EDA**: Understand patterns, trends, and anomalies.
+- **Machine Learning**: Develop a forecasting model using XGBoost.
 
-#### Returns
-- **`pd.DataFrame`**: A cleaned and enriched DataFrame ready for machine learning.
+The project is structured to provide actionable insights for better decision-making in retail operations.
 
 ---
 
-## Detailed Processing Steps
+## Data Description
 
-### 1. Column Selection
-Depending on whether the input is training or testing data:
-- **Training Data**: Requires columns like `'date'`, `'family'`, `'onpromotion'`, `'sales'`, `'store_nbr'`, and `'id'`.
-- **Test Data**: Requires columns like `'date'`, `'family'`, `'onpromotion'`, `'store_nbr'`, and `'id'`.
+The dataset contains multiple CSV files, including:
+- **train.csv**: Historical sales data for training.
+- **test.csv**: Data for testing the model.
+- **oil.csv**: Daily oil prices (may impact sales).
+- **holidays_events.csv**: Holiday information.
+- **stores.csv**: Store metadata.
+- **transactions.csv**: Historical transaction data.
 
-### 2. Dataset Merging
-- **Oil Data**: Merged on the `'date'` column to add crude oil prices (`dcoilwtico`).
-- **Holiday Data**: Merged on the `'date'` column to add holiday types and transfer status.
+Each row in the training data represents sales for a specific product family in a store on a particular day.
 
-### 3. Feature Engineering
-- **`is_holiday`**: Encodes holiday information based on the type of day and whether it is transferred.
-- **`onpromotion`**: Converts promotional status into binary values (0 or 1).
-- **`day_number`**: Encodes the date as an integer for machine learning models.
-- **`family` Encoding**: Performs one-hot encoding for the `family` column to represent product categories as binary features.
+---
 
-### 4. Handling Missing Data
-- **Crude Price**: Forward fills missing values.
-- **Other Columns**: Removes rows with missing values after processing.
+## Key Steps
+
+1. **Data Loading**:
+   - Loaded datasets using pandas.
+   - Merged relevant datasets for comprehensive analysis.
+
+2. **EDA**:
+   - Analyzed sales distribution.
+   - Identified missing data and unique attributes.
+   - Explored seasonal and trend components.
+
+3. **Feature Engineering**:
+   - Extracted temporal features (day, month, year).
+   - Incorporated external factors like holidays and oil prices.
+
+4. **Modeling**:
+   - Built a machine learning pipeline with XGBoost.
+   - Validated the model using cross-validation and appropriate metrics.
+
+5. **Visualization**:
+   - Created plots using Matplotlib, Seaborn, and Plotly to visualize trends and model performance.
 
 ---
 
 ## Requirements
 
-### Input Data
-- **Sales Data (`df`)**: Must contain the required columns for training or testing as specified.
-- **Oil Data (`oil_data`)**: Must include `date` and `dcoilwtico` (crude price).
-- **Holiday Data (`holidays_data`)**: Must include `date`, `type`, and `transferred`.
+- Python 3.7+
+- Libraries:
+  - pandas
+  - numpy
+  - matplotlib
+  - seaborn
+  - plotly
+  - scikit-learn
+  - xgboost
 
-### External Libraries
-- **Pandas**: For data manipulation.
-- **Numpy**: For numerical operations.
-
-Install these libraries using:
+Install the required libraries using:
 ```bash
-pip install pandas numpy
+pip install -r requirements.txt
 ```
 
 ---
 
-## Example Usage
-```python
-import pandas as pd
+## How to Use
 
-# Load datasets
-sales_data = pd.read_csv("sales.csv")
-oil_data = pd.read_csv("oil.csv")
-holidays_data = pd.read_csv("holidays.csv")
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-repo/time-series-analysis.git
+   cd time-series-analysis
+   ```
 
-# Process training and test datasets
-train_data = process_data(sales_data)
-test_data = process_data(sales_data, is_test=True)
+2. Open the notebook:
+   ```bash
+   jupyter notebook time-series.ipynb
+   ```
 
-print(train_data.head())
-```
-
----
-
-## Error Handling
-### Common Errors
-- **`KeyError: '[...] not in index'`**
-  - Cause: Missing required columns in the input DataFrame or external datasets.
-  - Solution: Verify input data using `print(df.columns)` before calling the function.
-
-- **`MergeError`**
-  - Cause: Inconsistent keys between datasets (e.g., missing `date` in `oil_data` or `holidays_data`).
-  - Solution: Check the `date` column in all datasets for consistency.
+3. Run all cells to reproduce the analysis and model.
 
 ---
 
-## Limitations
-- Assumes all input data is clean and free of duplicates.
-- Requires external datasets (`oil_data`, `holidays_data`) to be pre-loaded.
-- Drops rows with missing values after processing, which might affect the dataset size.
+## Results
+
+- The EDA revealed key insights into sales distribution and trends.
+- The XGBoost model achieved significant accuracy in forecasting future sales.
+- Seasonal and external factors were effectively incorporated into the model.
 
 ---
-
-## Future Enhancements
-- Add logging for each processing step.
-- Provide more granular error handling and fallback options.
-- Allow flexibility in column names through configuration parameters.
-
----
-
-## License
-This script is open-source and available for educational and non-commercial use.
-
----
-
-## Author
-**Mohammed Huzaifah**
-- Aspiring Machine Learning Engineer
-- Specialization in AI and Machine Learning
-
